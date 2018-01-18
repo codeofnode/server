@@ -11,7 +11,7 @@ const writeFile = promisify(fs.writeFile)
 
 async function main() {
   serverJson.root.$ = { name: pkg.name, version: pkg.version }
-  configJson.mountpath = `/api/v${Number(pkg.version.split('.').shift())+1}`;
+  configJson.mountpath = `/api/v${pkg.version.split('.').shift()}`;
   configJson.loglevel = 2;
   configJson.moduledir = 'modules';
   delete pkg.devDependencies;
