@@ -1,0 +1,116 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/logger",
+  "tests" : [
+    {
+      "summary": "Constructor Empty",
+      "request": {
+        "method": "default",
+        "construct": true
+      },
+      "assertions": {
+        "output": {
+          "loglevel": null
+        }
+      },
+      "extractors": {
+        "logger" : "output"
+      }
+    },
+    {
+      "summary": "error function",
+      "require": "{{logger}}",
+      "request": {
+        "method": "error"
+      }
+    },
+    {
+      "summary": "warn",
+      "require": "{{logger}}",
+      "request": {
+        "method": "warn"
+      }
+    },
+    {
+      "summary": "log",
+      "require": "{{logger}}",
+      "request": {
+        "method": "log"
+      }
+    },
+    {
+      "summary": "Constructor with level",
+      "request": {
+        "method": "default",
+        "construct": true,
+        "params": 1
+      },
+      "assertions": {
+        "output": {
+          "loglevel": 1
+        }
+      },
+      "extractors": {
+        "logger" : "output"
+      }
+    },
+    {
+      "summary": "error function",
+      "require": "{{logger}}",
+      "request": {
+        "method": "error"
+      }
+    },
+    {
+      "summary": "warn",
+      "require": "{{logger}}",
+      "request": {
+        "method": "warn"
+      }
+    },
+    {
+      "summary": "log",
+      "require": "{{logger}}",
+      "request": {
+        "method": "log"
+      }
+    },
+    {
+      "summary": "Constructor with level 2",
+      "request": {
+        "method": "default",
+        "construct": true,
+        "params": 2
+      },
+      "assertions": {
+        "output": {
+          "loglevel": 2
+        }
+      },
+      "extractors": {
+        "logger" : "output"
+      }
+    },
+    {
+      "summary": "error function",
+      "require": "{{logger}}",
+      "request": {
+        "method": "error"
+      }
+    },
+    {
+      "summary": "warn",
+      "require": "{{logger}}",
+      "request": {
+        "method": "warn"
+      }
+    },
+    {
+      "summary": "log",
+      "require": "{{logger}}",
+      "request": {
+        "method": "log"
+      }
+    }
+  ]
+}

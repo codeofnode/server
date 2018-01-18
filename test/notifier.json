@@ -1,0 +1,81 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/notifier",
+  "vars": {
+    "emptyEE": {
+      "domain": null,
+      "_events": {},
+      "_eventsCount": 0,
+      "_maxListeners": null
+    }
+  },
+  "tests" : [
+    {
+      "summary": "Constructor Empty",
+      "request": {
+        "method": "default",
+        "construct": true
+      },
+      "assertions": {
+        "output": {
+          "domain": null,
+          "_events": {},
+          "_eventsCount": 0,
+          "_maxListeners": null,
+          "subscribers": {}
+        }
+      },
+      "extractors": {
+        "noti" : "output"
+      }
+    },
+    {
+      "summary": "Subscribe function",
+      "require": "{{noti}}",
+      "request": {
+        "method": "subscribe",
+        "params": [
+          "na"
+        ]
+      },
+      "assertions": {
+        "output": "{{emptyEE}}"
+      },
+      "asserts":{
+        "{{noti}}" : {
+          "subscribers.na": "{{emptyEE}}"
+        }
+      }
+    },
+    {
+      "summary": "Notify all",
+      "require": "{{noti}}",
+      "request": {
+        "method": "notifyAll"
+      }
+    },
+    {
+      "summary": "notify one valid",
+      "require": "{{noti}}",
+      "request": {
+        "method": "notify",
+        "params": "na"
+      }
+    },
+    {
+      "summary": "notify one invalid",
+      "require": "{{noti}}",
+      "request": {
+        "method": "notify",
+        "params": "ba"
+      }
+    },
+    {
+      "summary": "notify one empty",
+      "require": "{{noti}}",
+      "request": {
+        "method": "notify"
+      }
+    }
+  ]
+}

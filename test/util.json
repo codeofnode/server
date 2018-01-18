@@ -1,0 +1,103 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/util",
+  "tests" : [
+    {
+      "summary": "No op",
+      "request": {
+        "method": "noop"
+      }
+    },
+    {
+      "summary": "pick",
+      "request": {
+        "method": "pick",
+        "params": [
+          {
+            "col1": {
+              "tata": 1
+            },
+            "gata": {
+              "ok": 1
+            }
+          },
+          [
+            "col1"
+          ]
+        ]
+      },
+      "assertions": {
+        "output": {
+          "col1": {
+            "tata": 1
+          }
+        }
+      }
+    },
+    {
+      "summary": "pad left",
+      "request": {
+        "method": "padLeft",
+        "params": [
+          "hello",
+          "*",
+          9
+        ]
+      },
+      "assertions": {
+        "output": "****hello"
+      }
+    },
+    {
+      "summary": "pad right",
+      "request": {
+        "method": "padRight",
+        "params": [
+          "hello",
+          "*",
+          9
+        ]
+      },
+      "assertions": {
+        "output": "hello****"
+      }
+    },
+    {
+      "summary": "resolving path",
+      "request": {
+        "method": "resolvePath",
+        "params": [
+          "/hello"
+        ]
+      },
+      "assertions": {
+        "output": "/hello"
+      }
+    },
+    {
+      "summary": "resolving path : non absolute",
+      "request": {
+        "method": "resolvePath",
+        "params": [
+          "hello"
+        ]
+      },
+      "assertions": {
+        "output": "{{plat.currDir}}/hello"
+      }
+    },
+    {
+      "summary": "resolving path : default",
+      "request": {
+        "method": "resolvePath",
+        "params": [
+          null,
+          "hello"
+        ]
+      },
+      "assertions": {
+        "output": "{{plat.currDir}}/hello"
+      }
+    }
+  ]
+}

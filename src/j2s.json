@@ -1,0 +1,16 @@
+{
+  "db" : {
+    "url": "mongodb://localhost/server-db",
+    "type": "loki"
+  },
+  "mountpath": "/api/v1",
+  "moduledir" : "src/modules",
+  "appStates": {
+    "STARTING": "STARTING",
+    "STARTED": "STARTED",
+    "CONNECTING_DB": "CONNECTING_DB",
+    "INITIALIZING": "INITIALIZING",
+    "MIGRATING": "MIGRATING",
+    "LISTENING": "LISTENING"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "description": "A boilerplate for web server, with modular architecture over microservices approach.",
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon --watch src --exec \"./node_modules/.bin/babel-node ./node_modules/.bin/json2server --jsonpath=src/server.json --rootdir=src/root --configpath=src/j2s.json\"",
+    "build": "rm -rf dist && mkdir dist && mkdir dist/root && ./node_modules/.bin/babel src -d dist && ./node_modules/.bin/babel-node scripts/build && cp README.md dist/",
+    "prodtest": "SCAN_DIR=dist npm run test",
+    "test": "./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/nyc ./node_modules/.bin/mocha -b test",
+    "all": "npm run lint && npm test && npm run build && npm run prodtest && npm run docs",
+    "docs": "./node_modules/.bin/jsdoc -c .jsdoc.json",
+    "lint": "./node_modules/.bin/eslint src",
+    "struct": "./node_modules/.bin/json2server -r=src/root -j=src/server.json -c=src/j2s.json -t=1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/codeofnode/server.git"
+  },
+  "keywords": [
+    "server",
+    "config",
+    "lightweight",
+    "cli",
+    "json"
+  ],
+  "author": "Ramesh Kumar <codeofnode@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/codeofnode/server",
+  "devDependencies": {
+    "allrounder": "latest",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-istanbul": "^4.1.5",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2017": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^5.0.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.0.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^5.0.1",
+    "eslint-plugin-react": "^7.0.1",
+    "istanbul": "^0.4.5",
+    "jsdoc": "^3.5.1",
+    "json": "^9.0.6",
+    "json2server": "latest",
+    "minami": "^1.2.3",
+    "mocha": "^3.4.2",
+    "mongodb": "^3.0.1",
+    "nodemon": "^1.11.0",
+    "nyc": "^11.0.2"
+  },
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "babel": {
+    "plugins": [
+      "transform-async-to-generator",
+      "transform-runtime"
+    ],
+    "presets": [
+      "es2017",
+      "stage-2",
+      [
+        "env",
+        {
+          "targets": {
+            "node": "8.2.1"
+          }
+        }
+      ]
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    }
+  },
+  "engines": {
+    "node": ">=8.2.1"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "lokijs": "^1.5.1"
+  }
+}

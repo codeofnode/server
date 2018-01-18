@@ -1,0 +1,273 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/store/loki",
+  "vars": {
+    "dbprefix": "app_",
+    "dbname": "teststore",
+    "dburl": "mongodb://localhost/{{dbname}}"
+  },
+  "timeout": 10000,
+  "tests" : [
+    {
+      "summary": "Dropping the database",
+      "request": {
+        "payload": "mongo {{dbname}} --eval 'db.dropDatabase()'"
+      },
+      "type": "command"
+    },
+    {
+      "summary": "Create id",
+      "request": {
+        "method": "default.GenId"
+      }
+    },
+    {
+      "summary": "Constructor Empty",
+      "request": {
+        "method": "default",
+        "construct": true,
+        "params": {
+          "url": "{{dburl}}"
+        }
+      },
+      "assertions": {
+        "output": {
+          "domain": null,
+          "_events": {},
+          "dbprefix": "{{dbprefix}}",
+          "_eventsCount": 0,
+          "_maxListeners": null,
+          "dburl": "{{dburl}}"
+        }
+      },
+      "extractors": {
+        "store" : "output"
+      }
+    },
+    {
+      "summary": "Calling connect",
+      "require": "{{store}}",
+      "request": {
+        "method": "connectDb"
+      }
+    },
+    {
+      "summary": "Creating a new collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "mkcoll",
+        "params" : "col1"
+      }
+    },
+    {
+      "summary": "listing the collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": "col1"
+      },
+      "assertions": {
+        "output.records": []
+      }
+    },
+    {
+      "summary": "creating new document",
+      "require": "{{store}}",
+      "request": {
+        "method": "write",
+        "params" : [
+          "col1",
+          null,
+          {
+            "ok": 1
+          }
+        ]
+      },
+      "assertions": {
+        "error": null
+      }
+    },
+    {
+      "summary": "listing all the collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "listcolls"
+      },
+      "assertions": {
+        "output": [
+          "col1"
+        ]
+      }
+    },
+    {
+      "summary": "listing the collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": "col1"
+      },
+      "extractors": {
+        "docId": "output.records.0"
+      }
+    },
+    {
+      "summary": "Reading a document",
+      "require": "{{store}}",
+      "request": {
+        "method": "read",
+        "params": [
+          "col1",
+          "{{docId}}"
+        ]
+      },
+      "assertions": {
+        "output.ok": 1
+      }
+    },
+    {
+      "summary": "updating new document",
+      "require": "{{store}}",
+      "request": {
+        "method": "write",
+        "params" : [
+          "col1",
+          "{{docId}}",
+          {
+            "ok": 2
+          }
+        ]
+      },
+      "assertions": {
+        "output": 1
+      }
+    },
+    {
+      "summary": "Reading a document to test the validation",
+      "require": "{{store}}",
+      "request": {
+        "method": "read",
+        "params": [
+          "col1",
+          "{{docId}}"
+        ]
+      },
+      "assertions": {
+        "output.ok": 2
+      }
+    },
+    {
+      "summary": "deleting document",
+      "require": "{{store}}",
+      "request": {
+        "method": "del",
+        "params" : [
+          "col1",
+          "{{docId}}"
+        ]
+      },
+      "assertions": {
+        "output": 1
+      }
+    },
+    {
+      "summary": "Creating a new collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "mkcoll",
+        "params" : "coll2"
+      }
+    },
+    {
+      "summary": "creating new document",
+      "require": "{{store}}",
+      "request": {
+        "method": "write",
+        "params" : [
+          "coll2",
+          null,
+          {
+            "ok": 1
+          }
+        ]
+      },
+      "extractors": {
+        "newId": "output._id"
+      },
+      "assertions": {
+        "error": null
+      }
+    },
+    {
+      "summary": "listing the collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": [
+          "coll2",
+          {},
+          {
+            "count": true
+          }
+        ]
+      },
+      "assertions": {
+        "output.total": 1
+      }
+    },
+    {
+      "summary": "list one collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "findOne",
+        "params": "coll2"
+      },
+      "assertions": {
+        "output": "{{newId}}"
+      }
+    },
+    {
+      "summary": "listing the collection documents that not exists",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": "coll3"
+      },
+      "assertions": {
+        "output.records": []
+      }
+    },
+    {
+      "summary": "listing all the collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "listcolls"
+      },
+      "assertions": {
+        "output.length": 2
+      }
+    },
+    {
+      "summary": "Drop a collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "rmcoll",
+        "params" : "coll2"
+      },
+      "assertions": {
+        "output": 1
+      }
+    },
+    {
+      "summary": "listing all the collection",
+      "require": "{{store}}",
+      "request": {
+        "method": "listcolls"
+      },
+      "assertions": {
+        "output": [
+          "col1"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/store/mongodb",
+  "tests": [
+    {
+      "import": "store"
+    }
+  ]
+}

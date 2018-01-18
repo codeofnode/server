@@ -1,0 +1,12 @@
+{
+  "vars": {
+    "contactEmail": "codeofnode@gmail.com"
+  },
+  "root": {
+    "health": {
+      "$": {
+        "ok": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "type": "unit",
+  "require": "{{plat.scanDir}}/modules/fixture",
+  "tests" : [
+    {
+      "summary": "Constructor Empty",
+      "request": {
+        "method": "default",
+        "construct": true,
+        "params": {
+          "fixturejs": "fixture"
+        }
+      },
+      "assertions": {
+        "output.fixturejs": "{{plat.currDir}}{{plat.sep}}fixture"
+      },
+      "extractors": {
+        "fixture" : "output"
+      }
+    },
+    {
+      "summary": "Load a file",
+      "require": "{{fixture}}",
+      "request": {
+        "method": "start"
+      },
+      "assertions": {
+        "output": null,
+        "error": null
+      }
+    }
+  ]
+}
