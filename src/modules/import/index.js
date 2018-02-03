@@ -19,7 +19,7 @@ class Import {
 
   /**
    * load a module
-   * @param {String} name - name of the module
+   * @param {String} name - name of the module. Use a dot as prefix if its an internal module.
    */
   load(name) {
     let toRet;

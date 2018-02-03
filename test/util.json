@@ -9,6 +9,15 @@
       }
     },
     {
+      "summary": "Delay",
+      "request": {
+        "method": "delay"
+      },
+      "assertions": {
+        "output": null
+      }
+    },
+    {
       "summary": "pick",
       "request": {
         "method": "pick",

@@ -37,10 +37,11 @@ class Store extends Base {
 
   /**
    * generate a random id
-   * @return {string} text - return random string id
+   * @param {String} inputId - the input string id to convert into object id
+   * @return {ObjectId} _id - return random object id
    */
-  static GenId() {
-    return new ObjectId();
+  static GenId(inputId) {
+    return new ObjectId(inputId);
   }
 
   /**
@@ -86,8 +87,8 @@ class Store extends Base {
    * @param {object} fields - the fields to retrieve
    * @return {Promise} promise - return a promise */
   async read(coll, _id, fields) {
-    const cont = await this.getCollection(coll).findOne({ _id }, { fields });
-    this.emit('doc:read', coll, _id, cont);
+    const cont = await this.getCollection(coll).findOne({ _id: Store.GenId(_id) }, { fields });
+    this.emitDbEvent(`read:${coll}:${_id}`, cont);
     return cont;
   }
 
@@ -96,27 +97,33 @@ class Store extends Base {
    * @param {string} coll - the collection, that should be read
    * @param {string} _id - the doc id at which, that should be created/updated
    * @param {object} data - the content in to write
+   * @param {object} options - the options to update the collection
    * @return {Promise} promise - return a promise
    */
-  async write(coll, _id, data) {
+  async write(coll, _id, data, options) {
     const collection = this.getCollection(coll);
     if (_id) {
-      await collection.findOneAndUpdate({ _id }, { $set: data });
-      this.emit('doc:update', coll, _id, data);
+      const prevData = await this.getPrevDoc(coll, Store.GenId(_id), options);
+      await collection.findOneAndUpdate({ _id: Store.GenId(_id) }, { $set: data });
+      this.emitDbEvent(`update:${coll}:${_id}`, data, prevData);
       return 1;
     }
-    return (await collection.insertOne(data)).insertedId.toString();
+    const newId = (await collection.insertOne(data)).insertedId.toString();
+    this.emitDbEvent(`create:${coll}:${newId}`, data);
+    return newId;
   }
 
   /**
    * delete a document.
    * @param {string} coll - the collection, that should be read
    * @param {string} _id - the doc id at which, that should be deleted
+   * @param {object} options - the options to delete the collection
    * @return {Promise} promise - return a promise
    */
-  async del(coll, _id) {
-    await this.getCollection(coll).deleteOne({ _id });
-    this.emit('doc:delete', coll, _id);
+  async del(coll, _id, options) {
+    const prevData = await this.getPrevDoc(coll, Store.GenId(_id), options);
+    await this.getCollection(coll).deleteOne({ _id: Store.GenId(_id) });
+    this.emitDbEvent(`delete:${coll}:${_id}`, prevData);
     return 1;
   }
 

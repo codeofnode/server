@@ -31,14 +31,13 @@
         }
       },
       "assertions": {
-        "output": {
-          "domain": null,
-          "_events": {},
-          "dbprefix": "{{dbprefix}}",
-          "_eventsCount": 0,
-          "_maxListeners": null,
-          "dburl": "{{dburl}}"
-        }
+        "output.domain": null,
+        "output._events": {},
+        "output.dbprefix": "{{dbprefix}}",
+        "output.defaultPageSize": 10,
+        "output._eventsCount": 0,
+        "output._maxListeners": null,
+        "output.dburl": "{{dburl}}"
       },
       "extractors": {
         "store" : "output"
@@ -64,6 +63,17 @@
       "require": "{{store}}",
       "request": {
         "method": "list",
+        "params": "col1"
+      },
+      "assertions": {
+        "output.records": []
+      }
+    },
+    {
+      "summary": "listing the collection documents as list all",
+      "require": "{{store}}",
+      "request": {
+        "method": "listAll",
         "params": "col1"
       },
       "assertions": {
@@ -104,6 +114,17 @@
       "require": "{{store}}",
       "request": {
         "method": "list",
+        "params": "col1"
+      },
+      "extractors": {
+        "docId": "output.records.0"
+      }
+    },
+    {
+      "summary": "listing the collection documents as list all",
+      "require": "{{store}}",
+      "request": {
+        "method": "listAll",
         "params": "col1"
       },
       "extractors": {
@@ -170,6 +191,125 @@
       }
     },
     {
+      "summary": "Bulk transaction one",
+      "require": "{{store}}",
+      "request": {
+        "method": "bulk",
+        "params" : {
+          "method": "write",
+          "body": ["col1", null, {
+            "ok": 5
+          }]
+        }
+      },
+      "assertions": {
+        "output.0.error": null
+      }
+    },
+    {
+      "summary": "listing the collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": [
+          "col1",
+          {},
+          {
+            "count": true
+          }
+        ]
+      },
+      "assertions": {
+        "output.total": 1
+      }
+    },
+    {
+      "summary": "Bulk transaction success",
+      "require": "{{store}}",
+      "request": {
+        "method": "bulk",
+        "params" : [
+          [
+            {
+              "first": true,
+              "method": "bulk",
+              "body": [
+                [
+                  {
+                    "method": "write",
+                    "body": ["col1", null, {
+                      "ok": 9
+                    }]
+                  },
+                  {
+                    "method": "write",
+                    "body": ["col1", null, {
+                      "ok": 8
+                    }]
+                  }
+                ]
+              ]
+            },
+            {
+              "first":true,
+              "method": "bulk",
+              "body": {
+                "from": "{{result.0}}",
+                "base" : {
+                  "method": "write"
+                },
+                "_": {
+                  "body": [
+                    "col1", "{{$data}}", {
+                      "ok": 3
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "method": "bulk",
+              "body": {
+                "from": "{{result.0}}",
+                "base" : {
+                  "method": "read"
+                },
+                "_": {
+                  "body": [
+                    "col1", "{{$data}}"
+                  ]
+                }
+              }
+            }
+          ]
+        ]
+      },
+      "assertions": {
+        "output.1": [1, 1]
+      }
+    },
+    {
+      "summary": "listing the collection documents",
+      "require": "{{store}}",
+      "request": {
+        "method": "list",
+        "params": [
+          "col1",
+          {},
+          {
+            "fields": {
+              "ok": 1
+            },
+            "count": true
+          }
+        ]
+      },
+      "assertions": {
+        "output.total": 3,
+        "ARRAY<output.records.*.ok": [5,3,3]
+      }
+    },
+    {
       "summary": "Creating a new collection",
       "require": "{{store}}",
       "request": {
@@ -202,6 +342,23 @@
       "require": "{{store}}",
       "request": {
         "method": "list",
+        "params": [
+          "coll2",
+          {},
+          {
+            "count": true
+          }
+        ]
+      },
+      "assertions": {
+        "output.total": 1
+      }
+    },
+    {
+      "summary": "listing the collection documents list all",
+      "require": "{{store}}",
+      "request": {
+        "method": "listAll",
         "params": [
           "coll2",
           {},

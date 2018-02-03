@@ -1,3 +1,5 @@
+/* eslint no-await-in-loop:0 */
+
 /**
  * @module migration
  */
@@ -27,6 +29,7 @@ class Migration {
   constructor(configOptions) {
     this.migdir = AppImport('.util').resolvePath(configOptions.migrationdir, 'migrations');
     this.store = configOptions.$store;
+    this.logger = configOptions.$logger;
     this.collection = AppImport('.util')
       .lastValue(configOptions, 'migration', 'collection') || 'migration';
     this.interval = AppImport('.util')
@@ -54,12 +57,33 @@ class Migration {
           throw er;
         }
       }
-      migs.slice(migDoc.lastMigrationNumber).forEach(async (file) => {
-        await AppImport(file);
-      });
+      const runLen = migs.length;
+      const undo = [];
+      let foundErr = false;
+      for (let run = migDoc.lastMigrationNumber; run < runLen; run += 1) {
+        const mig = AppImport(migs[run]);
+        try {
+          await mig.up(this.store, this.logger);
+        } catch (er) {
+          foundErr = er;
+          break;
+        }
+        undo.push(mig.down);
+      }
+      let newMigNum = migs.length;
+      if (foundErr) {
+        const undoLen = undo.length;
+        this.logger.error(foundErr);
+        for (let k = 0; k < undoLen; k += 1) {
+          if (typeof undo[k] === 'function') {
+            await undo[k](this.store, this.logger);
+          }
+        }
+        newMigNum = migDoc.lastMigrationNumber;
+      }
       await this.store.write(this.collection, migDoc._id, {
         isMigrating: false,
-        lastMigrationNumber: migs.length,
+        lastMigrationNumber: newMigNum,
       });
     }
   }

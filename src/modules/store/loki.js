@@ -23,7 +23,7 @@ class Store extends Base {
       [key1, key2] = [key2, key1];
     }
     const dc = Object.assign({}, doc);
-    if (Object.prototype.hasOwnProperty.call(dc, key1)) {
+    if (Object.hasOwnProperty.call(dc, key1)) {
       dc[key2] = dc[key1];
       delete dc[key1];
     }
@@ -53,14 +53,14 @@ class Store extends Base {
   }
 
   /**
-   * list all the entries
+   * list all the entries, based on pagination
    * @param {string} coll - the collection, that should be read
    * @param {object} filter - the filter to apply
    * @param {object} options - the options to list the collection
    * @return {Promise} promise - return a promise
    */
   async list(coll, filter, options) {
-    const { sort, skip = 0, limit = 10, count, fields } = options || {};
+    const { sort, skip = 0, limit = this.defaultPageSize, count, fields } = options || {};
     const fl = Store.resolveId(filter, true);
     let total = 0;
     const collection = this.getCollection(coll);
@@ -104,7 +104,7 @@ class Store extends Base {
   async read(coll, _id, fields) {
     const doc = this.getCollection(coll).get(_id);
     const cont = Store.resolveId(pick(doc, ...(Object.keys(fields || doc))));
-    this.emit('doc:read', coll, _id, cont);
+    this.emitDbEvent(`read:${coll}:${_id}`, cont);
     return cont;
   }
 
@@ -113,17 +113,19 @@ class Store extends Base {
    * @param {string} coll - the collection, that should be read
    * @param {string} _id - the doc id at which, that should be created/updated
    * @param {object} data - the content in to write
+   * @param {object} options - the options to update the collection
    * @return {Promise} promise - return a promise
    */
-  async write(coll, _id, data) {
+  async write(coll, _id, data, options) {
     const collection = this.getCollection(coll);
     if (_id) {
+      const prevData = await this.getPrevDoc(coll, _id, options);
       collection.findAndUpdate({ $loki: _id }, dc => Object.assign(dc, data));
-      this.emit('doc:update', coll, _id, data);
+      this.emitDbEvent(`update:${coll}:${_id}`, data, prevData);
       return 1;
     }
     const ob = collection.insert(data);
-    this.emit('doc:create', coll, ob.$loki, data);
+    this.emitDbEvent(`create:${coll}:${ob.$loki}`, data);
     return ob.$loki;
   }
 
@@ -131,11 +133,13 @@ class Store extends Base {
    * delete a document.
    * @param {string} coll - the collection, that should be read
    * @param {string} _id - the doc id at which, that should be deleted
+   * @param {object} options - the options to delete the collection
    * @return {Promise} promise - return a promise
    */
-  async del(coll, _id) {
+  async del(coll, _id, options) {
+    const prevData = await this.getPrevDoc(coll, _id, options);
     this.getCollection(coll).findAndRemove({ $loki: _id });
-    this.emit('doc:delete', coll, _id);
+    this.emitDbEvent(`delete:${coll}:${_id}`, prevData);
     return 1;
   }
 
@@ -146,7 +150,9 @@ class Store extends Base {
    * @return {String} coll - the collection name
    */
   mkcoll(coll, opts) {
-    this.db.addCollection(this.dbprefix + coll, opts);
+    if (!this.db.getCollection(coll)) {
+      this.db.addCollection(this.dbprefix + coll, opts);
+    }
     return 1;
   }
 
