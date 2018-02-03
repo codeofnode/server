@@ -92,7 +92,7 @@
         ]
       },
       "assertions": {
-        "output": "{{plat.currDir}}/hello"
+        "output": "{{plat.currDir}}{{plat.sep}}hello"
       }
     },
     {
@@ -105,7 +105,7 @@
         ]
       },
       "assertions": {
-        "output": "{{plat.currDir}}/hello"
+        "output": "{{plat.currDir}}{{plat.sep}}hello"
       }
     }
   ]
