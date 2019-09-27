@@ -2,8 +2,6 @@ import fs from 'fs'
 import { promisify } from 'util'
 import j2s from 'json2server'
 import pkg from '../package.json'
-import serverJson from '../src/server.json'
-import configJson from '../src/j2s.json'
 
 const replace = j2s.methods.replace
 const writeFile = promisify(fs.writeFile)

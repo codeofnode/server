@@ -3,7 +3,6 @@
   "require": "{{plat.scanDir}}/modules/notifier",
   "vars": {
     "emptyEE": {
-      "domain": null,
       "_events": {},
       "_eventsCount": 0,
       "_maxListeners": null
@@ -18,7 +17,6 @@
       },
       "assertions": {
         "output": {
-          "domain": null,
           "_events": {},
           "_eventsCount": 0,
           "_maxListeners": null,

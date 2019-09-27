@@ -11,7 +11,10 @@
     {
       "summary": "Dropping the database",
       "request": {
-        "payload": "mongo {{dbname}} --eval 'db.dropDatabase()'"
+        "payload": "${HOME}/install/mongo/3.6/bin/mongo {{dbname}} --eval 'db.dropDatabase()'"
+      },
+      "assertions": {
+        "error": ""
       },
       "type": "command"
     },
